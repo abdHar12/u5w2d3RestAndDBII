@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/authors")
@@ -32,6 +35,11 @@ public class AuthorController {
         else{
             return authorService.saveNewAuthor(authorDTO);
         }
+    }
+
+    @PostMapping("/upload/{id}")
+    public Author uploadAvatarImg(@PathVariable int id, @RequestParam("avatar") MultipartFile image) throws IOException {
+        return this.authorService.uploadImage(id, image);
     }
 
     @GetMapping("/{id}")

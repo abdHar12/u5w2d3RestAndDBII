@@ -1,6 +1,8 @@
 package harouane.u5w2d3RestAndDBII.Services;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import harouane.u5w2d3RestAndDBII.DTOs.AuthorDTO;
 import harouane.u5w2d3RestAndDBII.Entities.Author;
 import harouane.u5w2d3RestAndDBII.Exceptions.BadRequest;
@@ -13,7 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -22,6 +26,8 @@ public class AuthorService {
     AuthorsDAO authorsDAO;
     @Autowired
     BlogpostsDAO blogpostsDAO;
+    @Autowired
+    Cloudinary cloudinaryUploader;
     public Page<Author> findAll(int pageNumber, int size, String orderBy){
         if (size > 100) size = 100;
         Pageable pageable=PageRequest.of(pageNumber, size, Sort.by(orderBy));
@@ -53,4 +59,10 @@ public class AuthorService {
     }
 
 
+    public Author uploadImage(int id, MultipartFile image) throws IOException {
+        String url = (String) cloudinaryUploader.uploader().upload(image.getBytes(), ObjectUtils.emptyMap()).get("url");
+        Author found= findById(id);
+        found.setAvatar(url);
+        return authorsDAO.save(found);
+    }
 }
